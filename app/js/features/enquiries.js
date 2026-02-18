@@ -6,6 +6,7 @@ import {
   query,
   where,
   getDocs,
+  getDoc,
   deleteDoc,
   doc
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
@@ -16,6 +17,8 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
 document.addEventListener("DOMContentLoaded", () => {
+
+  const enquiryFallbackImage = new URL("../../assets/images/IMG5.jpg", import.meta.url).href;
 
   const enquiriesList = document.getElementById("enquiriesList");
 
@@ -82,26 +85,47 @@ document.addEventListener("DOMContentLoaded", () => {
 
       enquiriesList.innerHTML = "";
 
-      snapshot.forEach(docSnap => {
+      const enquiryDocs = snapshot.docs;
+
+      for (const docSnap of enquiryDocs) {
         const e = docSnap.data();
-        const id = docSnap.id;
+        const id = docSnap.id
+        let listingImage = e.listingImageUrl || "";
+
+        if (!listingImage && e.listingId) {
+          try {
+            const listingSnap = await getDoc(doc(db, "listings", e.listingId));
+            if (listingSnap.exists()) {
+              listingImage = listingSnap.data().imageUrl || "";
+            }
+          } catch (err) {
+            console.error("Could not fetch listing image for enquiry:", err);
+          }
+        }
+
+        if (!listingImage) listingImage = enquiryFallbackImage;
 
         const card = document.createElement("div");
         card.className = "enquiry-card";
 
         card.innerHTML = `
-          <h3>${e.listingTitle || "-"}</h3>
-          <p><strong>From:</strong> ${e.fromDate?.toDate().toLocaleDateString()}</p>
-          <p><strong>To:</strong> ${e.toDate?.toDate().toLocaleDateString()}</p>
-          <p><strong>Message:</strong> ${e.message || "-"}</p>
-          <p><strong>Status:</strong> ${e.status || "pending"}</p>
-          <button class="delete-enquiry-btn" data-id="${id}">
-            ❌ Remove Enquiry
-          </button>
+          <div class="enquiry-image-wrap">
+            <img src="${listingImage}" alt="${e.listingTitle || "Listing"}" class="enquiry-listing-image" onerror="this.onerror=null;this.src='${enquiryFallbackImage}'">
+          </div>
+          <div class="enquiry-content">
+            <h3>${e.listingTitle || "-"}</h3>
+            <p><strong>From:</strong> ${e.fromDate?.toDate().toLocaleDateString()}</p>
+            <p><strong>To:</strong> ${e.toDate?.toDate().toLocaleDateString()}</p>
+            <p><strong>Message:</strong> ${e.message || "-"}</p>
+            <p><strong>Status:</strong> ${e.status || "pending"}</p>
+            <button class="delete-enquiry-btn" data-id="${id}">
+              ❌ Remove Enquiry
+            </button>
+          </div>
         `;
 
         enquiriesList.appendChild(card);
-      });
+      }
 
     } catch (err) {
       console.error(err);

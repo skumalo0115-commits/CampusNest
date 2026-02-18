@@ -16,6 +16,13 @@ import {
 
 document.addEventListener("DOMContentLoaded", async () => {
 
+  const localFallbackGalleryImages = [
+    new URL("../../assets/images/gallery/bedroom.jpg", import.meta.url).href,
+    new URL("../../assets/images/gallery/toilet.jpg", import.meta.url).href,
+    new URL("../../assets/images/gallery/livingroom.jpg", import.meta.url).href,
+    new URL("../../assets/images/gallery/study-area.jpg", import.meta.url).href
+  ];
+
   const urlParams = new URLSearchParams(window.location.search);
   let listingId = urlParams.get("id");
   const landlordIdFromUrl = urlParams.get("landlordId");
@@ -26,6 +33,48 @@ document.addEventListener("DOMContentLoaded", async () => {
   const enquiryForm = document.getElementById("enquiryForm");
   const enquiryStatus = document.getElementById("enquiryStatus");
   const mapDiv = document.getElementById("listing-map");
+  const galleryImg = document.getElementById("galleryImage");
+
+  let currentIndex = 0;
+  let galleryImages = [...localFallbackGalleryImages];
+
+  async function getSharedFallbackImages(excludeListingId = "") {
+    try {
+      const listingsSnap = await getDocs(collection(db, "listings"));
+      const donorDoc = listingsSnap.docs.find((docSnap) => {
+        if (docSnap.id === excludeListingId) return false;
+        const data = docSnap.data() || {};
+        return Array.isArray(data.images) && data.images.length > 0;
+      });
+
+      if (!donorDoc) return [];
+      return donorDoc.data().images || [];
+    } catch (err) {
+      console.error("Failed to fetch shared fallback gallery images:", err);
+      return [];
+    }
+  }
+
+  function bindGallery() {
+    if (!galleryImg) return;
+    galleryImg.src = galleryImages[currentIndex];
+    galleryImg.onerror = () => {
+      galleryImg.onerror = null;
+      galleryImg.src = localFallbackGalleryImages[currentIndex % localFallbackGalleryImages.length];
+    };
+  }
+
+  window.prevImage = () => {
+    currentIndex = (currentIndex - 1 + galleryImages.length) % galleryImages.length;
+    bindGallery();
+  };
+
+  window.nextImage = () => {
+    currentIndex = (currentIndex + 1) % galleryImages.length;
+    bindGallery();
+  };
+
+  bindGallery();
 
   try {
     if (!listingId && landlordIdFromUrl) {
@@ -73,20 +122,19 @@ document.addEventListener("DOMContentLoaded", async () => {
     `;
 
     // Image Gallery
-    let currentIndex = 0;
-    const galleryImages = listing.images && listing.images.length ? listing.images : [mainImgUrl];
-    const galleryImg = document.getElementById("galleryImage");
-    if (galleryImg) galleryImg.src = galleryImages[currentIndex];
-
-    window.prevImage = () => {
-      currentIndex = (currentIndex - 1 + galleryImages.length) % galleryImages.length;
-      galleryImg.src = galleryImages[currentIndex];
-    };
-
-    window.nextImage = () => {
-      currentIndex = (currentIndex + 1) % galleryImages.length;
-      galleryImg.src = galleryImages[currentIndex];
-    };
+    const listingImages = Array.isArray(listing.images)
+      ? listing.images.filter((url) => typeof url === "string" && url.trim())
+      : [];
+    const listingHasImages = listingImages.length > 0;
+    if (listingHasImages) {
+      galleryImages = listingImages;
+    } else {
+      const sharedFallbackImages = await getSharedFallbackImages(listingId);
+      galleryImages = sharedFallbackImages.length ? sharedFallbackImages : localFallbackGalleryImages;
+    }
+    
+    currentIndex = 0;
+    bindGallery();
 
     // Landlord Info
     if (listing.landlordId) {
@@ -129,6 +177,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         await addDoc(collection(db, "enquiries"), {
           listingId,
           listingTitle: listing.title || "",
+          listingImageUrl: mainImgUrl,
           landlordId: listing.landlordId || "",
           fromDate: Timestamp.fromDate(new Date(fromDateRaw)),
           toDate: Timestamp.fromDate(new Date(toDateRaw)),
