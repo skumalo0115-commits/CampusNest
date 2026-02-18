@@ -29,7 +29,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     return String(str)
       .replace(/&/g, "&amp;")
       .replace(/</g, "&lt;")
-      .replace(/>/g, "&gt;"
+      .replace(/>/g, "&gt;")
       .replace(/\"/g, "&quot;")
       .replace(/'/g, "&#039;");
   }
@@ -117,7 +117,7 @@ document.addEventListener("DOMContentLoaded", async () => {
               <h2>${escapeHtml(ld.name)}</h2>
               <p>📍 ${escapeHtml(ld.city || 'Unknown City')}</p>
               <p>🏠 ${propertiesCount} Properties</p>
-              ${ld.verified ? '<span class="verified">✔ Verified Landlord</span>' : ''}
+              ${ld.verified ? '<span class="verified">✔ Verified</span>' : ''}
             </div>
           `;
           setTimeout(() => landlordInfoDiv.classList.add("visible"), 100);

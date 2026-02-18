@@ -458,12 +458,34 @@ a { color:inherit; text-decoration:none;}
 
    /* ===== Land info style ===== */
 
-    .landlord-info.visible {
+     .listings .landlord-info {
+      display: flex;
+      justify-content: center;
+      margin: 0 auto 28px;
+      text-align: center;
+      opacity: 0;
+      transform: translateY(8px);
+      transition: opacity 0.25s ease, transform 0.25s ease;
+    }
+
+    .listings .landlord-info.visible {
       opacity: 1;
       transform: translateY(0);
     }
 
-    .landlord-info img {
+    .listings .landlord-header-card {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      width: min(100%, 430px);
+      padding: 24px;
+      border-radius: 14px;
+      background: #f0f3f8;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+    }
+
+    .listings .landlord-info img {
       width: 150px;
       height: 150px;
       object-fit: cover;
@@ -473,19 +495,19 @@ a { color:inherit; text-decoration:none;}
       box-shadow: 0 6px 15px rgba(0,0,0,0.2);
     }
 
-    .landlord-info h2 {
+    .listings .landlord-info h2 {
       margin: 0 0 10px 0;
       font-size: 28px;
       color: #333;
     }
 
-    .landlord-info p {
+    .listings .landlord-info p {
       margin: 4px 0;
       font-size: 16px;
       color: #666;
     }
 
-    .landlord-info .verified {
+    .listings .landlord-info .verified {
       display: inline-block;
       background: #002077; 
       color: white;
@@ -573,7 +595,7 @@ a { color:inherit; text-decoration:none;}
 .landlord-card .btn.secondary { background:#003366; color:#fff; border:none; }
 .landlord-card .btn.secondary:hover { background:#ffcc00; color:#003366; }
 
-    .landlord-info .verified {
+    .listings .landlord-info .verified {
       display: inline-block;
       background: #002077; 
       color: white;
@@ -1576,4 +1598,3 @@ footer { background:#003366; color:#fff; padding:18px 0; text-align:center; marg
   margin-top: 8px;
   font-size: 1rem;
 }
-
