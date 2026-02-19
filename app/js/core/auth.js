@@ -48,14 +48,13 @@ function initAuth() {
 
   const provider = new GoogleAuthProvider();
 
-
   const showMessage = (el, msg, color = "red") => {
     if (!el) return;
     el.textContent = msg || "";
     el.style.color = color;
-  };
+    };
 
-  const normalizeAuthError = (err) => {
+ const normalizeAuthError = (err) => {
     const code = err?.code || "";
     if (code.includes("invalid-credential") || code.includes("wrong-password") || code.includes("user-not-found")) {
       return "Incorrect email or password.";
@@ -72,7 +71,26 @@ function initAuth() {
     if (code.includes("popup-blocked")) {
       return "Popup blocked by browser. Please allow popups and try again.";
     }
+    if (code.includes("network-request-failed")) {
+      return "Network error while contacting Firebase. Check your internet, disable blockers/VPN, and add this Railway domain in Firebase Auth authorized domains.";
+    }
     return err?.message || "Authentication failed. Please try again.";
+  };
+
+  const withRetry = async (fn, retries = 2) => {
+    let lastError;
+    for (let i = 0; i <= retries; i += 1) {
+      try {
+        return await fn();
+      } catch (err) {
+        lastError = err;
+        if (!(err?.code || "").includes("network-request-failed") || i === retries) {
+          throw err;
+        }
+        await new Promise((resolve) => setTimeout(resolve, 350 * (i + 1)));
+      }
+    }
+    throw lastError;
   };
 
   const ensureProfileIcon = () => {
@@ -173,7 +191,7 @@ if (signInTab && signUpTab && signInForm && signUpForm) {
       }
 
       try {
-        const uc = await createUserWithEmailAndPassword(auth, email, password);
+        const uc = await withRetry(() => createUserWithEmailAndPassword(auth, email, password));
 
         await setDoc(doc(db, "users", uc.user.uid), {
           name,
@@ -207,7 +225,7 @@ if (signInTab && signUpTab && signInForm && signUpForm) {
       }
 
       try {
-        await signInWithEmailAndPassword(auth, email, password);
+        await withRetry(() => signInWithEmailAndPassword(auth, email, password));
         showMessage(signInMessage, "Signed in successfully.", "green");
         if (authModal) authModal.style.display = "none";
       } catch (err) {
@@ -220,7 +238,7 @@ if (signInTab && signUpTab && signInForm && signUpForm) {
   /* ===========================
      GOOGLE SIGN-IN (USER ONLY)
      =========================== */
-  const ensureUserProfileDoc = async (user) => {
+   const ensureUserProfileDoc = async (user) => {
     const userRef = doc(db, "users", user.uid);
     const snap = await getDoc(userRef);
 
@@ -232,33 +250,17 @@ if (signInTab && signUpTab && signInForm && signUpForm) {
       });
     }
   };
-
   const googleLogin = async () => {
     showMessage(signInMessage, "");
     showMessage(signUpMessage, "");
-    
+
     try {
-      const result = await signInWithPopup(auth, provider);
+      const result = await withRetry(() => signInWithPopup(auth, provider), 1);
       await ensureUserProfileDoc(result.user);
       if (authModal) authModal.style.display = "none";
       showMessage(signInMessage, "Google sign-in successful.", "green");
     } catch (err) {
       console.error("Google sign-in error:", err);
-      const code = err?.code || "";
-
-      if (code.includes("popup-blocked") || code.includes("popup-closed-by-user")) {
-        try {
-          await signInWithRedirect(auth, provider);
-          return;
-        } catch (redirectErr) {
-          console.error("Google redirect sign-in error:", redirectErr);
-          const msg = normalizeAuthError(redirectErr);
-          showMessage(signInMessage, msg);
-          showMessage(signUpMessage, msg);
-          return;
-        }
-      }
-
       const msg = normalizeAuthError(err);
       showMessage(signInMessage, msg);
       showMessage(signUpMessage, msg);
@@ -282,7 +284,7 @@ if (signInTab && signUpTab && signInForm && signUpForm) {
       }
 
       try {
-        const uc = await signInWithEmailAndPassword(auth, email, password);
+        const uc = await withRetry(() => signInWithEmailAndPassword(auth, email, password));
         const adminDoc = await getDoc(doc(db, "admins", uc.user.uid));
 
         if (adminDoc.exists()) {
