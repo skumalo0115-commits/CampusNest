@@ -2298,17 +2298,27 @@ footer > p {
   border-color: #cfd8e3 !important;
 }
 
-.user-btn-icon {
-  background: #7b2ff7 !important;
-  color: #fff !important;
-}
 /* ===== CLEAN NAV + MOBILE LAYOUT OVERRIDES ===== */
 .nav-links > li > a {
-  background: transparent !important;
-  box-shadow: none !important;
-  border: 1px solid rgba(255, 255, 255, 0.35) !important;
+  background: rgba(255, 255, 255, 0.06) !important;
+  color: #ffffff !important;
+  border: 1px solid rgba(255, 204, 0, 0.75) !important;
+  box-shadow: inset 0 0 0 1px rgba(255, 204, 0, 0.15) !important;
   padding: 0.4rem 0.75rem;
   font-size: 0.9rem;
+}
+
+.nav-links > li > a:hover,
+.nav-links > li > a.active,
+.nav-links > li > a:focus-visible {
+  background: #ffcc00 !important;
+  color: #003366 !important;
+  border-color: #ffcc00 !important;
+}
+
+/* remove purple avatar emoji/icon from profile dropdown trigger */
+.user-btn-icon {
+  display: none !important;
 }
 
 #authBtn,
@@ -2321,6 +2331,21 @@ footer > p {
 
 .dropdown-menu #logoutBtn {
   text-align: center !important;
+}
+
+/* Keep home hero search block centered */
+.hero .search-bar {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Better enquiries spacing from footer */
+.enquiries-page {
+  padding-bottom: 48px;
+}
+
+.enquiries-list {
+  margin-bottom: 24px;
 }
 
 @media (max-width: 768px) {
@@ -2337,20 +2362,22 @@ footer > p {
     gap: 8px;
   }
 
+    /* page links stay in one horizontal row under heading */
   .nav-links {
     width: 100%;
     background: transparent !important;
     padding: 0 !important;
     justify-content: center;
     align-items: center;
-    gap: 0.35rem 0.45rem;
-    flex-wrap: wrap;
+    gap: 0.45rem;
+    flex-wrap: nowrap;
   }
 
   .nav-links > li {
     width: auto !important;
     display: flex;
     justify-content: center;
+    flex: 0 0 auto;
   }
 
   .nav-links > li:not(#authContainer):not(#userDropdown) {
@@ -2363,7 +2390,7 @@ footer > p {
     text-align: center;
     white-space: nowrap;
     padding: 0.35rem 0.55rem;
-    font-size: 0.82rem;
+    font-size: 0.8rem;
   }
 
   .nav-links #authContainer,
@@ -2374,7 +2401,7 @@ footer > p {
     width: 100%;
     display: flex;
     justify-content: center;
-    margin-top: 4px;
+    margin-top: 6px;
   }
 
   .nav-links #userDropdown {
@@ -2406,7 +2433,9 @@ footer > p {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 8px;
-    width: min(96vw, 430px);
+    width: min(94vw, 430px);
+    margin-left: auto;
+    margin-right: auto;
     padding: 10px;
   }
 
@@ -2425,35 +2454,43 @@ footer > p {
     width: 100%;
   }
 
+  /* listings + landlords mobile: one card per row */
   .listing-grid,
-  #landlord-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-    gap: 10px !important;
+    #landlord-grid,
+  .landlord-grid {
+    grid-template-columns: 1fr !important;
+    gap: 14px !important;
+    justify-items: center;
   }
 
   .card,
   .landlord-card {
-    max-width: none;
+    width: 100%;
+    max-width: 390px;
   }
 
+ /* slightly wider image area for better visibility */
   .card .img-wrap,
   .landlord-card .img-wrap {
-    height: 130px;
+    height: 155px;
   }
 
-  .card-body,
-  .landlord-card .card-body {
-    padding: 9px;
+  /* center verified badges on landlord/profile cards */
+  .card .verified,
+  .landlord-card .verified {
+    margin-left: auto !important;
+    margin-right: auto !important;
+    display: inline-flex !important;
+    justify-content: center;
+    align-items: center;
   }
-
-  .card-body h3,
-  .landlord-card h3 {
-    font-size: 0.95rem;
-  }
-
-  .meta,
-  .landlord-card .meta {
-    font-size: 0.78rem;
+  /* enquiries remove button centered */
+  .enquiry-content .delete-enquiry-btn,
+  .delete-enquiry-btn {
+    align-self: center;
+    margin: 14px auto 0;
+    display: inline-flex;
+    justify-content: center;
   }
 }
 
