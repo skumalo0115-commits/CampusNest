@@ -2516,6 +2516,39 @@ footer > p {
   }
 }
 
+/* ===== Mobile navbar/footer polish for all pages ===== */
+@media (max-width: 768px) {
+  .header .navbar {
+    align-items: center !important;
+  }
+
+  .nav-links {
+    justify-content: center !important;
+    flex-wrap: wrap !important;
+    row-gap: 8px;
+  }
+
+  .nav-links > li:not(#authContainer):not(#userDropdown) {
+    order: 1;
+  }
+
+  .nav-links #authContainer,
+  .nav-links #userDropdown {
+    flex-basis: 100%;
+    order: 2;
+    justify-content: center;
+    margin-top: 2px;
+  }
+
+  .nav-links #userDropdown {
+    order: 3;
+  }
+
+  .footer-column,
+  .footer-column h4 {
+    text-align: center;
+  }
+}
 /* ===== 2026-02 Mobile/Desktop alignment fixes ===== */
 
 /* Theme-consistent page nav buttons (not auth/profile buttons) */
@@ -2609,5 +2642,15 @@ footer > p {
     margin: 14px auto 0;
     display: inline-flex;
     justify-content: center;
+  }
+}
+
+
+@media (max-width: 768px) {
+  .nav-links > li:not(#authContainer):not(#userDropdown) a {
+    width: 156px;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
   }
 }

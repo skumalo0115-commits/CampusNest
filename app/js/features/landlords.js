@@ -1,48 +1,65 @@
 import { db, auth } from '../core/firebase.js';
+import {
+  collection,
+  getDocs,
+  query,
+  where
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 document.addEventListener("DOMContentLoaded", async () => {
-
   const grid = document.getElementById("landlord-grid");
+  if (!grid) return;
 
-  grid.innerHTML =
-    '<p style="grid-column:1/-1;color:#666;">Loading landlords...</p>';
+  grid.innerHTML = '<p style="grid-column:1/-1;color:#666;">Loading landlords...</p>';
 
   let currentUser = null;
+  try {
+    auth.onAuthStateChanged((user) => {
+      currentUser = user;
+    });
+  } catch (err) {
+    console.warn("Auth state listener failed:", err);
+  }
 
-  auth.onAuthStateChanged(user => {
-    currentUser = user;
-  });
+  const safeGetDocs = async (ref, retries = 2) => {
+    let lastError;
+    for (let i = 0; i <= retries; i += 1) {
+      try {
+        return await getDocs(ref);
+      } catch (err) {
+        lastError = err;
+        await new Promise((resolve) => setTimeout(resolve, 350 * (i + 1)));
+      }
+    }
+    throw lastError;
+  };
 
   try {
-    const { collection, getDocs, query, where } =
-      await import("https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js");
-
     const landlordsCol = collection(db, "landlords");
-    const snapshot = await getDocs(landlordsCol);
+    const snapshot = await safeGetDocs(landlordsCol);
 
     if (snapshot.empty) {
-      grid.innerHTML =
-        '<p style="grid-column:1/-1;color:#666;">No landlords found.</p>';
+      grid.innerHTML = '<p style="grid-column:1/-1;color:#666;">No landlords found.</p>';
       return;
     }
 
-    let landlords = snapshot.docs.map(doc => ({
-      id: doc.id,
-      data: doc.data()
+    let landlords = snapshot.docs.map((docSnap) => ({
+      id: docSnap.id,
+      data: docSnap.data()
     }));
 
-    landlords.sort((a, b) => {
+    landlords = landlords.sort((a, b) => {
       const aTime = a.data.createdAt?.toMillis?.() || 0;
       const bTime = b.data.createdAt?.toMillis?.() || 0;
       return bTime - aTime;
     });
 
     const propertyCounts = await Promise.all(
-      landlords.map(async ld => {
+      landlords.map(async (ld) => {
         try {
           const listingsCol = collection(db, "listings");
           const q = query(listingsCol, where("landlordId", "==", ld.id));
-          const snap = await getDocs(q);
+          const snap = await safeGetDocs(q, 1);
           return snap.size;
         } catch {
           return 0;
@@ -82,32 +99,27 @@ document.addEventListener("DOMContentLoaded", async () => {
       grid.appendChild(card);
     });
 
-    // 🔐 BLOCK ACTIONS IF LOGGED OUT
-    grid.addEventListener("click", e => {
+    grid.addEventListener("click", (e) => {
       const btn = e.target.closest("button");
       if (!btn) return;
 
       if (!currentUser) {
-        const modal = document.getElementById("authModal");
-        modal.style.display = "flex";
+        document.getElementById("authModal")?.style && (document.getElementById("authModal").style.display = "flex");
         return;
       }
 
       const id = btn.dataset.id;
-
       if (btn.classList.contains("contact-btn")) {
         window.location.href = `listing-details.html?landlordId=${id}`;
       }
-
       if (btn.classList.contains("view-properties-btn")) {
         window.location.href = `listings.html?landlordId=${id}`;
       }
     });
-
   } catch (err) {
     console.error("❌ Error loading landlords:", err);
-    grid.innerHTML =
-      `<p style="color:red;">Failed to load landlords: ${err.message}</p>`;
+    const msg = err?.message || "Unknown error";
+    grid.innerHTML = `<p style="color:red;">Failed to load landlords: ${escapeHtml(msg)}</p>`;
   }
 });
 

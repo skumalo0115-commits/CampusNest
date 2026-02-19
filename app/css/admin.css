@@ -568,3 +568,63 @@ tbody tr:hover {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
+
+/* ===== Themed Admin Modal ===== */
+.modal-overlay {
+  background: rgba(0, 28, 56, 0.58);
+  backdrop-filter: blur(2px);
+}
+
+.modal-box {
+  width: min(94vw, 480px);
+  border-radius: 16px;
+  border: 1px solid rgba(255, 204, 0, 0.45);
+  background: linear-gradient(180deg, #ffffff 0%, #f5f9ff 100%);
+  box-shadow: 0 20px 45px rgba(0, 32, 73, 0.24);
+}
+
+.modal-box h3 {
+  color: var(--navy);
+  margin-bottom: 14px;
+}
+
+.modal-content {
+  color: #1f2f44;
+  font-size: 0.95rem;
+  line-height: 1.45;
+}
+
+.admin-modal-info-grid {
+  display: grid;
+  gap: 10px;
+}
+
+.admin-modal-info-grid p {
+  margin: 0;
+  background: #ffffff;
+  border: 1px solid #d9e7f7;
+  border-left: 4px solid var(--gold);
+  border-radius: 10px;
+  padding: 9px 11px;
+}
+
+.modal-actions {
+  margin-top: 16px;
+}
+
+.btn-confirm,
+.btn-cancel {
+  min-width: 96px;
+  font-weight: 700;
+}
+
+.btn-confirm {
+  background: var(--navy);
+  border: 1px solid var(--navy);
+}
+
+.btn-cancel {
+  background: #fff7d6;
+  color: #5e4900;
+  border: 1px solid #f1cf52;
+}

@@ -83,6 +83,41 @@ import {
     const messagesBody  = document.querySelector("#messagesTable tbody");
     const unreadBadge   = document.getElementById("unreadMessagesBadge");
 
+const modalOverlay = document.getElementById("modalOverlay");
+    const modalTitle = document.getElementById("modalTitle");
+    const modalContent = document.getElementById("modalContent");
+    const modalConfirm = document.getElementById("modalConfirm");
+    const modalCancel = document.getElementById("modalCancel");
+
+    function showAdminModal({ title = "CampusNest", content = "", confirmText = "OK", cancelText = "Cancel", showCancel = true }) {
+      return new Promise((resolve) => {
+        modalTitle.textContent = title;
+        modalContent.innerHTML = content;
+        modalConfirm.textContent = confirmText;
+        modalCancel.textContent = cancelText;
+        modalCancel.style.display = showCancel ? "inline-flex" : "none";
+        modalOverlay.style.display = "flex";
+
+        const closeModal = (result) => {
+          modalOverlay.style.display = "none";
+          modalConfirm.removeEventListener("click", onConfirm);
+          modalCancel.removeEventListener("click", onCancel);
+          modalOverlay.removeEventListener("click", onOverlayClick);
+          resolve(result);
+        };
+
+        const onConfirm = () => closeModal(true);
+        const onCancel = () => closeModal(false);
+        const onOverlayClick = (event) => {
+          if (event.target === modalOverlay) closeModal(false);
+        };
+
+        modalConfirm.addEventListener("click", onConfirm);
+        modalCancel.addEventListener("click", onCancel);
+        modalOverlay.addEventListener("click", onOverlayClick);
+      });
+    }
+
     // =========================
     // MESSAGES (CONTACTS)
     // =========================
@@ -146,33 +181,6 @@ import {
           </tr>`;
       });
     });
-
-    enquiriesBody.addEventListener("click", async (e) => {
-  const btn = e.target.closest("button");
-  if (!btn) return;
-
-  const id = btn.dataset.id;
-  const action = btn.dataset.action;
-
-  if (action === "view") {
-    const docSnap = await getDoc(doc(db, "enquiries", id));
-    if (docSnap.exists()) {
-      const d = docSnap.data();
-      alert(
-        `From: ${d.userName || "-"}\n` +
-        `Email: ${d.userEmail || "-"}\n\n` +
-        `${d.message || "-"}`
-      );
-    }
-  }
-
-  if (action === "delete") {
-    if (confirm("Delete this enquiry?")) {
-      await deleteDoc(doc(db, "enquiries", id));
-    }
-  }
-});
-
 // =========================
 // LISTINGS (ADMIN)
 // =========================
@@ -252,7 +260,13 @@ listingsBody.addEventListener("click", async (e) => {
     const current = snap.data().status || "Pending";
     const next = current === "Active" ? "Pending" : "Active";
 
-    if (!confirm(`Change status to "${next}"?`)) return;
+      const approved = await showAdminModal({
+      title: "Update Listing Status",
+      content: `<p>Change listing status to <strong>${next}</strong>?</p>`,
+      confirmText: "Update",
+      cancelText: "Cancel"
+    });
+    if (!approved) return;
 
     await updateDoc(ref, { status: next });
     loadListings();
@@ -260,7 +274,13 @@ listingsBody.addEventListener("click", async (e) => {
 
   // ---------- DELETE ----------
   if (btn.classList.contains("btn-delete")) {
-    if (!confirm("Delete this listing?")) return;
+    const approved = await showAdminModal({
+      title: "Delete Listing",
+      content: "<p>This listing will be permanently removed.</p>",
+      confirmText: "Delete",
+      cancelText: "Keep"
+    });
+    if (!approved) return;
     await deleteDoc(doc(db, "listings", id));
     loadListings();
   }
@@ -327,7 +347,13 @@ document.addEventListener("click", async (e) => {
 
   const delContactBtn = e.target.closest(".btn-delete-contact");
   if (delContactBtn) {
-    if (!confirm("Delete message?")) return;
+    const approved = await showAdminModal({
+      title: "Delete Message",
+      content: "<p>This message will be permanently removed.</p>",
+      confirmText: "Delete",
+      cancelText: "Keep"
+    });
+    if (!approved) return;
     await deleteDoc(doc(db, "contacts", delContactBtn.dataset.id));
     return;
   }
@@ -338,21 +364,47 @@ document.addEventListener("click", async (e) => {
   const viewEnquiryBtn = e.target.closest(".btn-view-enquiry");
   if (viewEnquiryBtn) {
     const snap = await getDoc(doc(db, "enquiries", viewEnquiryBtn.dataset.id));
-    if (!snap.exists()) return alert("Enquiry not found.");
+    if (!snap.exists()) {
+      await showAdminModal({
+        title: "Enquiry",
+        content: "<p>Enquiry not found.</p>",
+        confirmText: "Close",
+        showCancel: false
+      });
+      return;
+    }
 
     const d = snap.data();
-   alert(
-  `From: ${d.userName || "-"}\n` +
-  `Email: ${d.userEmail || "-"}\n\n` +
-  `${d.message || "-"}`
-);
+    const createdAt = d.createdAt?.toDate?.().toLocaleString() || "-";
+
+    await showAdminModal({
+      title: "Enquiry Details",
+      content: `
+        <div class="admin-modal-info-grid">
+          <p><strong>From:</strong> ${escapeHtml(d.userName || "-")}</p>
+          <p><strong>Email:</strong> ${escapeHtml(d.userEmail || "-")}</p>
+          <p><strong>Listing:</strong> ${escapeHtml(d.listingTitle || d.listingName || "Unknown Listing")}</p>
+          <p><strong>Listing ID:</strong> ${escapeHtml(d.listingId || "-")}</p>
+          <p><strong>Sent:</strong> ${escapeHtml(createdAt)}</p>
+          <p><strong>Message:</strong><br>${escapeHtml(d.message || "-")}</p>
+        </div>
+      `,
+      confirmText: "Close",
+      showCancel: false
+    });
 
     return;
   }
 
   const delEnquiryBtn = e.target.closest(".btn-delete-enquiry");
   if (delEnquiryBtn) {
-    if (!confirm("Delete enquiry?")) return;
+    const approved = await showAdminModal({
+      title: "Delete Enquiry",
+      content: "<p>This enquiry will be permanently removed.</p>",
+      confirmText: "Delete",
+      cancelText: "Keep"
+    });
+    if (!approved) return;
     await deleteDoc(doc(db, "enquiries", delEnquiryBtn.dataset.id));
     return;
   }
@@ -372,7 +424,13 @@ document.addEventListener("click", async (e) => {
 
   const delLandlordBtn = e.target.closest(".btn-delete-landlord");
   if (delLandlordBtn) {
-    if (!confirm("Delete landlord?")) return;
+        const approved = await showAdminModal({
+      title: "Delete Landlord",
+      content: "<p>This landlord profile will be permanently removed.</p>",
+      confirmText: "Delete",
+      cancelText: "Keep"
+    });
+    if (!approved) return;
     await deleteDoc(doc(db, "landlords", delLandlordBtn.dataset.id));
     return;
   }
@@ -382,7 +440,13 @@ document.addEventListener("click", async (e) => {
   ====================== */
   const delUserBtn = e.target.closest(".btn-delete-user");
   if (delUserBtn) {
-    if (!confirm("Delete user?")) return;
+    const approved = await showAdminModal({
+      title: "Delete User",
+      content: "<p>This user account record will be permanently removed.</p>",
+      confirmText: "Delete",
+      cancelText: "Keep"
+    });
+    if (!approved) return;
     await deleteDoc(doc(db, "users", delUserBtn.dataset.id));
   }
 });

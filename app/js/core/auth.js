@@ -12,6 +12,8 @@ import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   signInWithPopup,
+  signInWithRedirect,
+  getRedirectResult,
   GoogleAuthProvider,
   updateProfile,
   onAuthStateChanged,
@@ -46,13 +48,31 @@ function initAuth() {
 
   const provider = new GoogleAuthProvider();
 
-  const DEMO_ADMIN_EMAIL = "s.kumalo0115@gmail.com";
-  const DEMO_ADMIN_PASSWORD = "Admin123!";
 
   const showMessage = (el, msg, color = "red") => {
     if (!el) return;
     el.textContent = msg || "";
     el.style.color = color;
+  };
+
+  const normalizeAuthError = (err) => {
+    const code = err?.code || "";
+    if (code.includes("invalid-credential") || code.includes("wrong-password") || code.includes("user-not-found")) {
+      return "Incorrect email or password.";
+    }
+    if (code.includes("email-already-in-use")) {
+      return "That email is already registered.";
+    }
+    if (code.includes("weak-password")) {
+      return "Password is too weak (minimum 6 characters).";
+    }
+    if (code.includes("popup-closed-by-user")) {
+      return "Google popup was closed before sign-in completed.";
+    }
+    if (code.includes("popup-blocked")) {
+      return "Popup blocked by browser. Please allow popups and try again.";
+    }
+    return err?.message || "Authentication failed. Please try again.";
   };
 
   const ensureProfileIcon = () => {
@@ -165,8 +185,8 @@ if (signInTab && signUpTab && signInForm && signUpForm) {
 
         showMessage(signUpMessage, "Account created", "green");
         setTimeout(() => window.location.href = "profile.html", 800);
-      } catch {
-        showMessage(signUpMessage, "Sign up failed");
+      } catch (err) {
+        showMessage(signUpMessage, normalizeAuthError(err));
       }
     });
   }
@@ -187,45 +207,61 @@ if (signInTab && signUpTab && signInForm && signUpForm) {
       }
 
       try {
-  await signInWithEmailAndPassword(auth, email, password);
-
-  // ✅ Success: close modal & clear message
-  showMessage(signInMessage, "", "green");
-  if (authModal) authModal.style.display = "none";
-
-} catch (err) {
-  console.error("Login error:", err);
-  showMessage(signInMessage, "Login failed");
-}
+        await signInWithEmailAndPassword(auth, email, password);
+        showMessage(signInMessage, "Signed in successfully.", "green");
+        if (authModal) authModal.style.display = "none";
+      } catch (err) {
+        console.error("Login error:", err);
+        showMessage(signInMessage, normalizeAuthError(err));
+      }
     });
   }
 
   /* ===========================
      GOOGLE SIGN-IN (USER ONLY)
      =========================== */
+  const ensureUserProfileDoc = async (user) => {
+    const userRef = doc(db, "users", user.uid);
+    const snap = await getDoc(userRef);
+
+    if (!snap.exists()) {
+      await setDoc(userRef, {
+        name: user.displayName || "",
+        email: user.email || "",
+        createdAt: serverTimestamp()
+      });
+    }
+  };
+
   const googleLogin = async () => {
+    showMessage(signInMessage, "");
+    showMessage(signUpMessage, "");
+    
     try {
       const result = await signInWithPopup(auth, provider);
-      const user = result.user;
-
-      // Ensure user document exists
-      const userRef = doc(db, "users", user.uid);
-      const snap = await getDoc(userRef);
-
-      if (!snap.exists()) {
-        await setDoc(userRef, {
-          name: user.displayName || "",
-          email: user.email,
-          createdAt: serverTimestamp()
-        });
-      }
-
+      await ensureUserProfileDoc(result.user);
       if (authModal) authModal.style.display = "none";
-      
-
+      showMessage(signInMessage, "Google sign-in successful.", "green");
     } catch (err) {
       console.error("Google sign-in error:", err);
-      alert("Google sign-in failed");
+      const code = err?.code || "";
+
+      if (code.includes("popup-blocked") || code.includes("popup-closed-by-user")) {
+        try {
+          await signInWithRedirect(auth, provider);
+          return;
+        } catch (redirectErr) {
+          console.error("Google redirect sign-in error:", redirectErr);
+          const msg = normalizeAuthError(redirectErr);
+          showMessage(signInMessage, msg);
+          showMessage(signUpMessage, msg);
+          return;
+        }
+      }
+
+      const msg = normalizeAuthError(err);
+      showMessage(signInMessage, msg);
+      showMessage(signUpMessage, msg);
     }
   };
 
@@ -255,8 +291,8 @@ if (signInTab && signUpTab && signInForm && signUpForm) {
           await signOut(auth);
           showMessage(signInMessage, "Not an admin");
         }
-      } catch {
-        showMessage(signInMessage, "Admin login failed");
+      } catch (err) {
+        showMessage(signInMessage, normalizeAuthError(err));
       }
     });
   }
@@ -275,6 +311,18 @@ if (signInTab && signUpTab && signInForm && signUpForm) {
       }
     });
   }
+
+    getRedirectResult(auth)
+    .then(async (result) => {
+      if (!result?.user) return;
+      await ensureUserProfileDoc(result.user);
+      if (authModal) authModal.style.display = "none";
+    })
+    .catch((err) => {
+      const msg = normalizeAuthError(err);
+      showMessage(signInMessage, msg);
+      showMessage(signUpMessage, msg);
+    }); 
 
   if (userMenuBtn && dropdownMenu) {
     ensureProfileIcon();

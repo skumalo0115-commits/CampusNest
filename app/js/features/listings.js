@@ -15,6 +15,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   const landlordInfoDiv = document.getElementById("landlord-info");
   const searchInput = document.getElementById("searchInput");
   const applySearchBtn = document.getElementById("applySearchBtn");
+  let hasManualSearchOverride = false;
 
   if (!listingContainer || !landlordInfoDiv) return;
 
@@ -34,6 +35,19 @@ document.addEventListener("DOMContentLoaded", async () => {
       .replace(/'/g, "&#039;");
   }
 
+    const safeGetDocs = async (ref, retries = 2) => {
+    let lastError;
+    for (let i = 0; i <= retries; i += 1) {
+      try {
+        return await getDocs(ref);
+      } catch (err) {
+        lastError = err;
+        await new Promise((resolve) => setTimeout(resolve, 350 * (i + 1)));
+      }
+    }
+    throw lastError;
+  };
+
   function getQueryParam(param) {
     const urlParams = new URLSearchParams(window.location.search);
     return urlParams.get(param);
@@ -45,10 +59,10 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   function applyFilters() {
-    const search = (searchInput?.value || getQueryParam("search") || "").toLowerCase().trim();
-    const min = Number(getQueryParam("min") || 0);
-    const max = Number(getQueryParam("max") || 0);
-    const beds = String(getQueryParam("beds") || "").trim();
+    const search = (searchInput?.value || "").toLowerCase().trim();
+    const min = hasManualSearchOverride ? 0 : Number(getQueryParam("min") || 0);
+    const max = hasManualSearchOverride ? 0 : Number(getQueryParam("max") || 0);
+    const beds = hasManualSearchOverride ? "" : String(getQueryParam("beds") || "").trim();
 
     const cards = listingContainer.querySelectorAll(".card");
     cards.forEach(card => {
@@ -75,6 +89,14 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
   }
 
+    function activateManualSearch() {
+    if (hasManualSearchOverride) return;
+    hasManualSearchOverride = true;
+
+    const cleanUrl = `${window.location.pathname}`;
+    window.history.replaceState({}, "", cleanUrl);
+  }
+
   function initSearchFromUrl() {
     if (searchInput) searchInput.value = getQueryParam("search") || "";
   }
@@ -91,7 +113,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         listingsRef = query(listingsRef, where("landlordId", "==", landlordId));
       }
 
-      const snapshot = await getDocs(listingsRef);
+      const snapshot = await safeGetDocs(listingsRef);
 
       if (snapshot.empty) {
         listingContainer.innerHTML =
@@ -180,14 +202,26 @@ document.addEventListener("DOMContentLoaded", async () => {
       });
 
     } catch (err) {
-      console.error(err);
+      console.error("Failed to load listings:", err);
+      const reason = escapeHtml(err?.message || "Unknown error");
       listingContainer.innerHTML =
-        `<p style="grid-column:1/-1;color:red;">Failed to load listings.</p>`;
+        `<p style="grid-column:1/-1;color:red;">Failed to load listings: ${reason}</p>`;
     }
   }
 
-  if (searchInput) searchInput.addEventListener("input", applyFilters);
-  if (applySearchBtn) applySearchBtn.addEventListener("click", applyFilters);
+  if (searchInput) {
+    searchInput.addEventListener("input", () => {
+      activateManualSearch();
+      applyFilters();
+    });
+  }
+
+  if (applySearchBtn) {
+    applySearchBtn.addEventListener("click", () => {
+      activateManualSearch();
+      applyFilters();
+    });
+  }
 
   // ✅ PUBLIC PAGE – LOAD IMMEDIATELY
   loadListings();
