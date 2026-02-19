@@ -532,4 +532,39 @@ tbody tr:hover {
     width: min(92vw, 360px);
     padding: 16px;
   }
+  }
+/* ===== FINAL PHONE FIT FOR ADMIN ===== */
+@media (max-width: 768px) {
+  .main-content {
+    padding: 10px !important;
+  }
+
+  .table-section {
+    padding: 10px !important;
+    border-radius: 10px;
+  }
+
+  .table-section h2 {
+    font-size: 1rem;
+    margin-bottom: 10px;
+  }
+
+  table {
+    min-width: 540px;
+    font-size: 0.78rem;
+  }
+
+  th,
+  td {
+    padding: 7px 6px;
+  }
+
+  .btn-action {
+    font-size: 0.7rem;
+    padding: 4px 7px;
+  }
+
+  .dashboard-cards {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }

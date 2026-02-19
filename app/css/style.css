@@ -2302,3 +2302,157 @@ footer > p {
   background: #7b2ff7 !important;
   color: #fff !important;
 }
+/* ===== CLEAN NAV + MOBILE LAYOUT OVERRIDES ===== */
+.nav-links > li > a {
+  background: transparent !important;
+  box-shadow: none !important;
+  border: 1px solid rgba(255, 255, 255, 0.35) !important;
+  padding: 0.4rem 0.75rem;
+  font-size: 0.9rem;
+}
+
+#authBtn,
+.user-btn {
+  min-width: 98px;
+  padding: 7px 12px !important;
+  font-size: 0.88rem;
+  line-height: 1.1;
+}
+
+.dropdown-menu #logoutBtn {
+  text-align: center !important;
+}
+
+@media (max-width: 768px) {
+  .header .navbar {
+    flex-direction: column;
+    align-items: center !important;
+    gap: 10px;
+    padding: 0.7rem 0.6rem;
+  }
+
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .nav-links {
+    width: 100%;
+    background: transparent !important;
+    padding: 0 !important;
+    justify-content: center;
+    align-items: center;
+    gap: 0.35rem 0.45rem;
+    flex-wrap: wrap;
+  }
+
+  .nav-links > li {
+    width: auto !important;
+    display: flex;
+    justify-content: center;
+  }
+
+  .nav-links > li:not(#authContainer):not(#userDropdown) {
+    order: 1;
+  }
+
+  .nav-links > li:not(#authContainer):not(#userDropdown) a {
+    width: auto !important;
+    min-width: 0;
+    text-align: center;
+    white-space: nowrap;
+    padding: 0.35rem 0.55rem;
+    font-size: 0.82rem;
+  }
+
+  .nav-links #authContainer,
+  .nav-links #userDropdown {
+    position: static !important;
+    transform: none !important;
+    order: 2;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    margin-top: 4px;
+  }
+
+  .nav-links #userDropdown {
+    order: 3;
+  }
+
+  #authBtn,
+  .user-btn {
+    width: auto !important;
+    min-width: 98px;
+    border-radius: 999px !important;
+    padding: 6px 12px !important;
+    font-size: 0.84rem;
+  }
+
+  .dropdown-menu {
+    top: calc(100% + 8px);
+    left: 50% !important;
+    right: auto !important;
+    transform: translate(-50%, -8px) !important;
+    min-width: 180px;
+  }
+
+  .dropdown.is-open .dropdown-menu {
+    transform: translate(-50%, 0) !important;
+  }
+
+  .hero .search-bar {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px;
+    width: min(96vw, 430px);
+    padding: 10px;
+  }
+
+  .hero .search-bar input {
+    grid-column: 1 / -1;
+    width: 100%;
+  }
+
+  .hero .search-bar select {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .hero .search-bar .search-btn {
+    grid-column: 1 / -1;
+    width: 100%;
+  }
+
+  .listing-grid,
+  #landlord-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 10px !important;
+  }
+
+  .card,
+  .landlord-card {
+    max-width: none;
+  }
+
+  .card .img-wrap,
+  .landlord-card .img-wrap {
+    height: 130px;
+  }
+
+  .card-body,
+  .landlord-card .card-body {
+    padding: 9px;
+  }
+
+  .card-body h3,
+  .landlord-card h3 {
+    font-size: 0.95rem;
+  }
+
+  .meta,
+  .landlord-card .meta {
+    font-size: 0.78rem;
+  }
+}
