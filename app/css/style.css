@@ -1722,6 +1722,131 @@ footer {
   }
 }
 
+/* ===== 2026 UI REFINEMENT: FEEDBACK FOLLOW-UP ===== */
+:root {
+  --theme-surface-1: #f5fbff;
+  --theme-surface-2: #e8f3ff;
+  --theme-card-1: #ffffff;
+  --theme-card-2: #f2f8ff;
+}
+
+body,
+main,
+.hero,
+.features,
+.stats,
+.listings,
+.about,
+.profile-page,
+.form-page,
+.add-landlord-section,
+.listing-details,
+.contact-page,
+.enquiries-page {
+  background-image: linear-gradient(180deg, var(--theme-surface-1) 0%, var(--theme-surface-2) 100%);
+}
+
+/* keep home search button blue as requested */
+.search-bar .search-btn,
+.hero .search-btn,
+.btn.search-btn {
+  background-image: linear-gradient(135deg, #0b5fb8, #003f86) !important;
+  color: #fff !important;
+}
+
+.search-bar .search-btn:hover,
+.hero .search-btn:hover,
+.btn.search-btn:hover {
+  background-image: linear-gradient(135deg, #0f70d8, #0a4f92) !important;
+}
+
+/* navbar button borders should be yellow */
+.nav-links > li > a,
+#authBtn {
+  border: 1.5px solid #ffcc00;
+  box-shadow: inset 0 0 0 1px rgba(255, 204, 0, 0.2);
+}
+
+/* two-tone surfaces across cards/boxes/dropdowns/footer */
+.card,
+.feature-card,
+.about-card,
+.landlord-card,
+.listing-info,
+.profile-container,
+.form-wrap,
+.add-form,
+.review-card,
+.stat-box,
+.enquiry-card,
+.dropdown-menu,
+.dropdown-content,
+.auth-box,
+.review-modal-content {
+  background-image: linear-gradient(165deg, var(--theme-card-1) 0%, var(--theme-card-2) 100%);
+}
+
+.dropdown-header,
+.footer-column h4,
+.topbar h1,
+.listings h1,
+.reviews-section h2,
+.stats h2,
+.about h1,
+.form-page h1,
+.add-landlord-section h1,
+.listing-details h1,
+.listing-details h2,
+.profile-container h1,
+.contact-page h1,
+.enquiries-page h1 {
+  text-shadow: 0 0 8px color-mix(in srgb, currentColor 30%, white 70%);
+}
+
+footer {
+  background-image: linear-gradient(145deg, #002a57 0%, #003f86 100%);
+}
+
+.footer-column h4 {
+  color: #ffd84d;
+}
+
+/* Apply add-review style language to file pickers on add-listing/add-landlord */
+.listing-form input[type="file"],
+.form-wrap input[type="file"],
+.add-form input[type="file"] {
+  border: 1px dashed #8cb8e6;
+  background: linear-gradient(180deg, #dff1ff, #c9e8ff);
+  border-radius: 10px;
+  padding: 10px;
+}
+
+.listing-form input[type="file"]::file-selector-button,
+.form-wrap input[type="file"]::file-selector-button,
+.add-form input[type="file"]::file-selector-button {
+  border: none;
+  border-radius: 8px;
+  margin-right: 12px;
+  padding: 10px 14px;
+  color: #fff;
+  font-weight: 600;
+  background: linear-gradient(135deg, #003366, #0a4f92);
+  cursor: pointer;
+}
+
+.listing-form input[type="file"]::file-selector-button:hover,
+.form-wrap input[type="file"]::file-selector-button:hover,
+.add-form input[type="file"]::file-selector-button:hover {
+  background: linear-gradient(135deg, #0a4f92, #1562b0);
+}
+
+/* global heading glow (kept subtle and color-aware) */
+h1,
+h2,
+h3 {
+  text-shadow: 0 0 6px color-mix(in srgb, currentColor 22%, white 78%);
+}
+
 /* Themed forms (Add Listing / Add Landlord) */
 .add-listing,
 .add-landlord {
@@ -1849,4 +1974,331 @@ footer {
   .enquiry-image-wrap {
     min-height: 200px;
   }
+}
+/* ===== 2026 UI POLISH: STABLE LAYOUT + THEME CONSISTENCY ===== */
+:root {
+  --theme-blue-1: #003366;
+  --theme-blue-2: #0a4f92;
+  --theme-blue-soft-1: #dff1ff;
+  --theme-blue-soft-2: #c9e8ff;
+  --theme-accent-1: #ffcc00;
+  --theme-accent-2: #f3b700;
+  --theme-baby-blue: #9edcff;
+}
+
+html,
+body {
+  overscroll-behavior: none;
+  overflow-x: hidden;
+  background: linear-gradient(180deg, #f5fbff 0%, #edf6ff 100%);
+}
+
+.header,
+footer,
+.btn,
+.reviews-section,
+.features,
+.stats,
+.about,
+.listings,
+.profile-page,
+.form-page,
+.add-landlord-section {
+  background-image: linear-gradient(145deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0));
+}
+
+.header {
+  background-image: linear-gradient(135deg, var(--theme-blue-1), var(--theme-blue-2));
+}
+
+.logo span {
+  color: #f8fdff;
+  text-shadow: 0 0 8px rgba(219, 227, 233, 0.95), 0 0 14px rgba(219, 227, 233, 0.8);
+}
+
+.nav-links > li > a,
+#authBtn {
+  border: 1.5px solid var(--theme-baby-blue);
+  background: linear-gradient(135deg, rgba(158, 220, 255, 0.12), rgba(158, 220, 255, 0.03));
+}
+
+.nav-links > li > a:hover,
+.nav-links > li > a.active,
+#authBtn:hover {
+  border-color: #d5f0ff;
+}
+
+.btn,
+.auth-form .btn,
+.search-bar .search-btn,
+.btn.view-btn {
+  background-image: linear-gradient(135deg, var(--theme-accent-1), var(--theme-accent-2));
+}
+
+.review-modal-content {
+  background: linear-gradient(180deg, #ffffff 0%, #f4f9ff 100%);
+}
+
+.review-modal-content h3 {
+  text-align: center;
+  color: var(--theme-blue-1);
+  margin-bottom: 14px;
+}
+
+.review-form input[type="file"] {
+  border: 1px dashed #8cb8e6;
+  background: linear-gradient(180deg, var(--theme-blue-soft-1), var(--theme-blue-soft-2));
+  cursor: pointer;
+}
+
+.review-form input[type="file"]::file-selector-button {
+  border: none;
+  border-radius: 8px;
+  margin-right: 12px;
+  padding: 10px 14px;
+  color: #fff;
+  font-weight: 600;
+  background: linear-gradient(135deg, var(--theme-blue-1), var(--theme-blue-2));
+  cursor: pointer;
+}
+
+.review-form button[type="submit"] {
+  display: block;
+  margin: 14px auto 8px;
+  min-width: 170px;
+  text-align: center;
+}
+
+@media (max-width: 900px) {
+  .navbar,
+  .nav-links,
+  .nav-links li,
+  .hero-content,
+  .reviews-actions,
+  .actions,
+  .form-wrap,
+  .add-form {
+    text-align: center;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .navbar {
+    padding: 0.8rem 1rem;
+    gap: 10px;
+  }
+
+  .nav-links {
+    width: 100%;
+    flex-wrap: wrap;
+    gap: 0.7rem;
+  }
+
+  .nav-links > li {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+  }
+
+  .nav-links a,
+  .btn.auth-open,
+  #authBtn {
+    width: min(340px, 100%);
+    text-align: center;
+  }
+
+  input,
+  select,
+  textarea,
+  button {
+    font-size: 16px !important;
+  }
+
+  .review-modal-content {
+    padding: 18px;
+  }
+}
+
+/* ===== FINAL OVERRIDES: keep latest feedback authoritative ===== */
+.nav-links > li > a,
+#authBtn {
+  border: 1.5px solid #ffcc00 !important;
+  box-shadow: inset 0 0 0 1px rgba(255, 204, 0, 0.2);
+}
+
+.search-bar .search-btn,
+.hero .search-btn,
+.btn.search-btn {
+  background-image: linear-gradient(135deg, #0b5fb8, #003f86) !important;
+  color: #fff !important;
+}
+
+.listing-form input[type="file"],
+.form-wrap input[type="file"],
+.add-form input[type="file"] {
+  border: 1px dashed #8cb8e6 !important;
+  background: linear-gradient(180deg, #dff1ff, #c9e8ff) !important;
+}
+
+.listing-form input[type="file"]::file-selector-button,
+.form-wrap input[type="file"]::file-selector-button,
+.add-form input[type="file"]::file-selector-button {
+  border: none;
+  border-radius: 8px;
+  margin-right: 12px;
+  padding: 10px 14px;
+  color: #fff;
+  font-weight: 600;
+  background: linear-gradient(135deg, #003366, #0a4f92) !important;
+  cursor: pointer;
+}
+
+h1,
+h2,
+h3 {
+  text-shadow: 0 0 6px rgba(255, 255, 255, 0.45), 0 0 2px rgba(0, 0, 0, 0.08);
+}
+
+/* ===== SCROLL BEHAVIOR FIX: keep vertical scrolling enabled ===== */
+html,
+body {
+  overflow-y: auto !important;
+  overscroll-behavior-y: auto !important;
+  overscroll-behavior-x: none;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y pinch-zoom;
+}
+
+/* ===== NAVBAR LAYOUT REFINEMENT: center nav buttons, separate profile button ===== */
+.header .navbar {
+  position: relative;
+}
+
+.nav-links {
+  flex: 1;
+  justify-content: center;
+  padding-right: 170px;
+}
+
+.nav-links #userDropdown {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  margin-left: 0;
+}
+
+@media (max-width: 900px) {
+  .header .navbar {
+    align-items: center;
+  }
+
+  .nav-links {
+    padding-right: 0;
+    width: 100%;
+  }
+
+  .nav-links #userDropdown {
+    position: static;
+    transform: none;
+    order: 99;
+    margin-top: 8px;
+  }
+}
+
+/* ===== FINAL UX TWEAKS: footer alignment + auth button position + landlord spacing ===== */
+footer .container > p,
+footer > p {
+  text-align: center;
+  width: 100%;
+  font-weight: 600;
+}
+
+/* Keep sign-in exactly where profile dropdown button appears */
+.nav-links #authContainer,
+.nav-links #userDropdown {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+#authBtn {
+  border-radius: 50px !important;
+  font-weight: 700 !important;
+  padding: 8px 16px;
+  min-width: 108px;
+  line-height: 1;
+}
+
+/* Extra breathing room between landlord cards and footer */
+.landlords {
+  padding-bottom: 20px;
+}
+
+.landlords .listing-grid,
+.landlords .landlord-grid,
+#landlord-grid {
+  margin-bottom: 18px;
+}
+
+@media (max-width: 900px) {
+  .nav-links #authContainer,
+  .nav-links #userDropdown {
+    position: static;
+    transform: none;
+  }
+
+  #authContainer {
+    order: 98;
+  }
+
+  #userDropdown {
+    order: 99;
+  }
+}
+
+/* ===== FINAL BUTTON TWEAK: white/silver shiny Sign In button ===== */
+#authBtn {
+  background: linear-gradient(135deg, #ffffff 0%, #f2f7ff 38%, #e1e8f2 70%, #ffffff 100%) !important;
+  color: #1f3d61 !important;
+  border: 1.5px solid #d7dee8 !important;
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.75) inset,
+    0 8px 18px rgba(8, 29, 58, 0.18),
+    0 0 10px rgba(227, 236, 248, 0.7);
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.85);
+}
+
+#authBtn:hover {
+  background: linear-gradient(135deg, #ffffff 0%, #f8fbff 42%, #e7edf6 75%, #ffffff 100%) !important;
+  color: #153556 !important;
+  border-color: #cfd8e3 !important;
+}
+
+/* ===== FINAL PROFILE BUTTON TWEAK: match Sign In silver style, keep purple icon ===== */
+.user-btn,
+.profile-btn {
+  background: linear-gradient(135deg, #ffffff 0%, #f2f7ff 38%, #e1e8f2 70%, #ffffff 100%) !important;
+  color: #1f3d61 !important;
+  border: 1.5px solid #d7dee8 !important;
+  border-radius: 50px !important;
+  font-weight: 700 !important;
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.75) inset,
+    0 8px 18px rgba(8, 29, 58, 0.18),
+    0 0 10px rgba(227, 236, 248, 0.7);
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.85);
+}
+
+.user-btn:hover,
+.profile-btn:hover {
+  background: linear-gradient(135deg, #ffffff 0%, #f8fbff 42%, #e7edf6 75%, #ffffff 100%) !important;
+  color: #153556 !important;
+  border-color: #cfd8e3 !important;
+}
+
+.user-btn-icon {
+  background: #7b2ff7 !important;
+  color: #fff !important;
 }
