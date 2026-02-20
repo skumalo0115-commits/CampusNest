@@ -17,7 +17,10 @@ import {
   GoogleAuthProvider,
   updateProfile,
   onAuthStateChanged,
-  signOut
+  signOut,
+  setPersistence,
+  browserLocalPersistence,
+  inMemoryPersistence
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
 /* ===========================
@@ -80,15 +83,34 @@ function initAuth() {
     }
     if (code.includes("operation-not-supported-in-this-environment")) {
       return "This browser blocked popup sign-in. Retrying with Google redirect...";
+
     }
     if (code.includes("unauthorized-domain")) {
       return `This domain (${window.location.hostname}) is not authorized for Google login. Add it in Firebase Console → Authentication → Settings → Authorized domains.`;
     }
     if (code.includes("operation-not-supported-in-this-environment")) {
       return "This browser blocked popup sign-in. Retrying with Google redirect...";
+
     }
     return err?.message || "Authentication failed. Please try again.";
   };
+
+
+  const ensurePersistence = (() => {
+    let persistencePromise;
+
+    return () => {
+      if (!persistencePromise) {
+        persistencePromise = setPersistence(auth, browserLocalPersistence)
+          .catch(() => setPersistence(auth, inMemoryPersistence))
+          .catch((error) => {
+            console.warn("Unable to configure Firebase auth persistence", error);
+          });
+      }
+
+      return persistencePromise;
+    };
+  })();
 
   const withRetry = async (fn, retries = 2) => {
     let lastError;
@@ -132,6 +154,8 @@ function initAuth() {
       userMenuBtn.setAttribute("aria-expanded", "true");
     }
   };
+
+  ensurePersistence();
 
   /* ===========================
    AUTH TABS (SIGN IN / SIGN UP)
@@ -204,6 +228,7 @@ if (signInTab && signUpTab && signInForm && signUpForm) {
       }
 
       try {
+        await ensurePersistence();
         const uc = await withRetry(() => createUserWithEmailAndPassword(auth, email, password));
 
         await setDoc(doc(db, "users", uc.user.uid), {
@@ -238,6 +263,7 @@ if (signInTab && signUpTab && signInForm && signUpForm) {
       }
 
       try {
+        await ensurePersistence();
         await withRetry(() => signInWithEmailAndPassword(auth, email, password));
         showMessage(signInMessage, "Signed in successfully.", "green");
         if (authModal) authModal.style.display = "none";
@@ -268,6 +294,7 @@ if (signInTab && signUpTab && signInForm && signUpForm) {
     showMessage(signUpMessage, "");
 
     try {
+      await ensurePersistence();
       const result = await withRetry(() => signInWithPopup(auth, provider), 1);
       await ensureUserProfileDoc(result.user);
       if (authModal) authModal.style.display = "none";
@@ -318,6 +345,7 @@ if (signInTab && signUpTab && signInForm && signUpForm) {
       }
 
       try {
+        await ensurePersistence();
         const uc = await withRetry(() => signInWithEmailAndPassword(auth, email, password));
         const adminDoc = await getDoc(doc(db, "admins", uc.user.uid));
 
