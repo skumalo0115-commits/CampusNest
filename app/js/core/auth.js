@@ -17,7 +17,10 @@ import {
   GoogleAuthProvider,
   updateProfile,
   onAuthStateChanged,
-  signOut
+  signOut,
+  setPersistence,
+  browserLocalPersistence,
+  inMemoryPersistence
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
 /* ===========================
@@ -47,6 +50,7 @@ function initAuth() {
   const dropdownMenu = userDropdown?.querySelector(".dropdown-menu");
 
   const provider = new GoogleAuthProvider();
+  provider.setCustomParameters({ prompt: "select_account" });
 
   const showMessage = (el, msg, color = "red") => {
     if (!el) return;
@@ -72,10 +76,33 @@ function initAuth() {
       return "Popup blocked by browser. Please allow popups and try again.";
     }
     if (code.includes("network-request-failed")) {
-      return "Network error while contacting Firebase. Check your internet, disable blockers/VPN, and add this Railway domain in Firebase Auth authorized domains.";
+      return `Firebase auth is blocked for this site (${window.location.hostname}). In Firebase Console: Authentication → Settings → Authorized domains, add this exact domain. Then in Authentication → Sign-in method, enable Email/Password and Google.`;
+    }
+    if (code.includes("unauthorized-domain")) {
+      return `Domain not authorized: ${window.location.hostname}. Fix: Firebase Console → Authentication → Settings → Authorized domains → Add domain. Then save and redeploy.`;
+    }
+    if (code.includes("operation-not-supported-in-this-environment")) {
+      return "This browser blocked popup sign-in. Retrying with Google redirect...";
     }
     return err?.message || "Authentication failed. Please try again.";
   };
+
+
+  const ensurePersistence = (() => {
+    let persistencePromise;
+
+    return () => {
+      if (!persistencePromise) {
+        persistencePromise = setPersistence(auth, browserLocalPersistence)
+          .catch(() => setPersistence(auth, inMemoryPersistence))
+          .catch((error) => {
+            console.warn("Unable to configure Firebase auth persistence", error);
+          });
+      }
+
+      return persistencePromise;
+    };
+  })();
 
   const withRetry = async (fn, retries = 2) => {
     let lastError;
@@ -119,6 +146,8 @@ function initAuth() {
       userMenuBtn.setAttribute("aria-expanded", "true");
     }
   };
+
+  ensurePersistence();
 
   /* ===========================
    AUTH TABS (SIGN IN / SIGN UP)
@@ -191,6 +220,7 @@ if (signInTab && signUpTab && signInForm && signUpForm) {
       }
 
       try {
+        await ensurePersistence();
         const uc = await withRetry(() => createUserWithEmailAndPassword(auth, email, password));
 
         await setDoc(doc(db, "users", uc.user.uid), {
@@ -225,6 +255,7 @@ if (signInTab && signUpTab && signInForm && signUpForm) {
       }
 
       try {
+        await ensurePersistence();
         await withRetry(() => signInWithEmailAndPassword(auth, email, password));
         showMessage(signInMessage, "Signed in successfully.", "green");
         if (authModal) authModal.style.display = "none";
@@ -255,11 +286,33 @@ if (signInTab && signUpTab && signInForm && signUpForm) {
     showMessage(signUpMessage, "");
 
     try {
+      await ensurePersistence();
       const result = await withRetry(() => signInWithPopup(auth, provider), 1);
       await ensureUserProfileDoc(result.user);
       if (authModal) authModal.style.display = "none";
       showMessage(signInMessage, "Google sign-in successful.", "green");
     } catch (err) {
+      const code = err?.code || "";
+      const shouldUseRedirect =
+        code.includes("popup-blocked") ||
+        code.includes("cancelled-popup-request") ||
+        code.includes("operation-not-supported-in-this-environment");
+
+      if (shouldUseRedirect) {
+        try {
+          showMessage(signInMessage, "Opening Google sign-in...", "#003366");
+          showMessage(signUpMessage, "Opening Google sign-in...", "#003366");
+          await signInWithRedirect(auth, provider);
+          return;
+        } catch (redirectError) {
+          console.error("Google redirect sign-in error:", redirectError);
+          const redirectMsg = normalizeAuthError(redirectError);
+          showMessage(signInMessage, redirectMsg);
+          showMessage(signUpMessage, redirectMsg);
+          return;
+        }
+      }
+
       console.error("Google sign-in error:", err);
       const msg = normalizeAuthError(err);
       showMessage(signInMessage, msg);
@@ -284,6 +337,7 @@ if (signInTab && signUpTab && signInForm && signUpForm) {
       }
 
       try {
+        await ensurePersistence();
         const uc = await withRetry(() => signInWithEmailAndPassword(auth, email, password));
         const adminDoc = await getDoc(doc(db, "admins", uc.user.uid));
 
@@ -402,4 +456,3 @@ if (document.readyState === "loading") {
 } else {
   initAuth();
 }
-
