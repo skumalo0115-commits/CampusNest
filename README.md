@@ -100,14 +100,6 @@ CampusNest/
 └── package.json
 ```
 
----
-
-## 💼 GitHub Short Description (Copy/Paste)
-
-> **CampusNest** is a Firebase-powered student accommodation platform for listing discovery, landlord verification, and enquiry management with role-based admin moderation. 🏡✨
-
----
-
 ## 🤝 Contribution
 
 PRs and feedback are welcome! Open an issue, suggest improvements, and help improve student housing access with tech. 💙
