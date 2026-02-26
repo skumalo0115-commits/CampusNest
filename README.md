@@ -4,6 +4,8 @@
 
 [![Status](https://img.shields.io/badge/status-active-success)](#) [![Built%20with](https://img.shields.io/badge/Built%20with-Firebase-orange)](#) [![Frontend](https://img.shields.io/badge/Frontend-HTML%2FCSS%2FJS-blue)](#)
 
+<img width="1900" height="917" alt="image" src="https://github.com/user-attachments/assets/9f2de5b2-52f9-4afb-abd1-fa646000278f" />
+
 ---
 
 ## ✨ What is CampusNest?
