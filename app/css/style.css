@@ -773,9 +773,41 @@ footer {
 .footer-grid {
   display:grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 20px;
+  gap: 28px;
   text-align: left;
   margin-bottom: 18px;
+  align-items: start;
+}
+
+.footer-column {
+  min-width: 0;
+}
+
+.footer-column h4,
+.footer-column p {
+  margin: 0;
+}
+
+.footer-brand p {
+  max-width: 26ch;
+  line-height: 1.7;
+}
+
+.footer-link-list,
+.footer-contact-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.footer-link-list {
+  display: grid;
+  gap: 10px;
+}
+
+.footer-contact-list {
+  display: grid;
+  gap: 12px;
 }
 
 .footer-column h4 {
@@ -790,18 +822,47 @@ footer {
   font-size: 0.95rem;
 }
 
-.footer-column a,
+.footer-link-list a,
 .footer-contact-link {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  margin: 4px 0;
+  gap: 10px;
+  margin: 0;
   transition: color .2s ease;
+  text-decoration: none;
 }
 
-.footer-column a:hover,
+.footer-link-list a:hover,
 .footer-contact-link:hover {
   color: #ffcc00;
+}
+
+.footer-contact-link {
+  align-items: flex-start;
+}
+
+.footer-contact-link i {
+  width: 18px;
+  color: #ffcc00;
+  flex-shrink: 0;
+  margin-top: 3px;
+}
+
+.footer-contact-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.footer-contact-copy strong {
+  color: #fff;
+  font-size: 0.88rem;
+  font-weight: 700;
+}
+
+.footer-contact-copy span {
+  color: #dbe9ff;
+  line-height: 1.5;
 }
 
 .footer-bottom {
@@ -2547,6 +2608,20 @@ footer > p {
   .footer-column,
   .footer-column h4 {
     text-align: center;
+  }
+
+  .footer-brand p {
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .footer-link-list,
+  .footer-contact-list {
+    justify-items: center;
+  }
+
+  .footer-contact-link {
+    text-align: left;
   }
 }
 /* ===== 2026-02 Mobile/Desktop alignment fixes ===== */
