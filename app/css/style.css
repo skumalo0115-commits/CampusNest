@@ -2752,19 +2752,20 @@ footer > p {
 /* ===== 2026-02 Mobile/Desktop alignment fixes ===== */
 
 /* Theme-consistent page nav buttons (not auth/profile buttons) */
-.nav-links > li > a {
+.nav-links > li:not(#authContainer):not(#userDropdown) > a {
   background: rgba(255, 255, 255, 0.06) !important;
   color: #ffffff !important;
-  border: 1px solid rgba(255, 204, 0, 0.75) !important;
-  box-shadow: inset 0 0 0 1px rgba(255, 204, 0, 0.15);
+  border: none !important;
+  box-shadow: none !important;
 }
 
-.nav-links > li > a:hover,
-.nav-links > li > a.active,
-.nav-links > li > a:focus-visible {
+.nav-links > li:not(#authContainer):not(#userDropdown) > a:hover,
+.nav-links > li:not(#authContainer):not(#userDropdown) > a.active,
+.nav-links > li:not(#authContainer):not(#userDropdown) > a:focus-visible {
   background: #ffcc00 !important;
   color: #003366 !important;
-  border-color: #ffcc00 !important;
+  border: none !important;
+  box-shadow: none !important;
 }
 
 /* Keep home hero search block centered */
