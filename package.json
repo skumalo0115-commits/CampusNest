@@ -4,6 +4,7 @@
   "version": "1.0.0",
   "scripts": {
     "dev": "python3 -m http.server 5500 --directory app",
-    "dev:node": "npx http-server app -p 5500 -c-1"
+    "dev:node": "npx http-server app -p 5500 -c-1",
+    "build:vercel": "node scripts/build-vercel.mjs"
   }
 }

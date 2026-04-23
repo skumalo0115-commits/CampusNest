@@ -26,6 +26,7 @@ It is designed to be practical, mobile-friendly, and easy to scale.
 
 - **Website:** https://campusnest-production.up.railway.app/index.html
 - **Alternative demo:** https://campusnest-sa.netlify.app/index.html
+- **Vercel-ready:** This repo now includes `vercel.json` plus a Vercel build step.
 
 ---
 
@@ -54,7 +55,7 @@ It is designed to be practical, mobile-friendly, and easy to scale.
 
 - **Frontend:** HTML5, CSS3, JavaScript (ES Modules)
 - **Backend Services:** Firebase Authentication, Cloud Firestore, Firebase Storage
-- **Hosting/Deploy:** Railway, Netlify
+- **Hosting/Deploy:** Railway, Netlify, Vercel
 - **Version Control:** Git + GitHub
 - **Testing/Debugging:** Browser DevTools, Playwright smoke checks
 
@@ -73,6 +74,22 @@ Then open:
 
 - `http://localhost:5500/Pages/index.html`
 
+## Vercel Deployment
+
+This project keeps the existing Railway setup and now also supports Vercel.
+
+1. Import the repository into Vercel
+2. Vercel reads `vercel.json`
+3. The deployment runs `npm run build:vercel`
+4. Vercel serves the generated `dist/` folder
+
+The Vercel build publishes the same layout that Railway already serves:
+
+- `app/Pages/*` -> `dist/`
+- `app/css` -> `dist/css`
+- `app/js` -> `dist/js`
+- `app/assets` -> `dist/assets`
+
 ---
 
 ## 🔐 Firebase Setup Checklist (Important)
@@ -84,6 +101,7 @@ If authentication fails, confirm these first:
    - Enable **Google**
 2. Firebase Console → **Authentication** → **Settings** → **Authorized domains**
    - Add your deployed domain (example: `campusnest-production.up.railway.app`)
+   - If you deploy on Vercel, also add your `*.vercel.app` domain or custom domain
 3. Confirm your Firebase config values in `app/js/core/firebase.js`
 
 ---
