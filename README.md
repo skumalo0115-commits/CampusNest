@@ -24,8 +24,8 @@ It is designed to be practical, mobile-friendly, and easy to scale.
 
 ## 🌍 Live Demo
 
-- **Website:** https://campusnest-production.up.railway.app/index.html
-- **Alternative Website:** https://campus-nest-gamma.vercel.app
+- **Website:** https://campus-nest-gamma.vercel.app 
+- **Alternative Website:** https://campusnest-production.up.railway.app/index.html
 - **Vercel-ready:** This repo now includes `vercel.json` plus a Vercel build step.
 
 ---
