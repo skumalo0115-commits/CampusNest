@@ -22,7 +22,7 @@ It is designed to be practical, mobile-friendly, and easy to scale.
 
 ---
 
-## 🌍 Live Demo
+## 🌍 Live Websites
 
 - **Website:** https://campus-nest-gamma.vercel.app 
 - **Alternative Website:** https://campusnest-production.up.railway.app/index.html
